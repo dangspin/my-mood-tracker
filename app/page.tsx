@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import DiaryCard, { Diary } from "@/components/DiaryCard";
 
@@ -26,9 +27,16 @@ export default function HomePage() {
 
   return (
     <div>
-      <h2 className="mb-4 text-lg font-semibold text-slate-800">
-        今天的心情记录
-      </h2>
+      <div className="mb-4 flex items-center justify-between">
+        <h2 className="text-lg font-semibold text-slate-800">今天的心情记录</h2>
+
+        <Link
+          href="/stats"
+          className="rounded-full bg-sky-50 px-3 py-1 text-xs font-medium text-sky-700 transition-colors hover:bg-sky-100"
+        >
+          查看统计
+        </Link>
+      </div>
 
       <div>
         {diaries.map((diary) => (

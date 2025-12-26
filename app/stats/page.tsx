@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import type { Diary } from "@/components/DiaryCard";
 
@@ -27,9 +28,18 @@ export default function StatsPage() {
 
   return (
     <div>
-      <h2 className="mb-4 text-lg font-semibold text-slate-800">
+      <div className="mb-4 flex items-center justify-between">
+      <h2 className="text-lg font-semibold text-slate-800">
         心情数据统计
       </h2>
+
+      <Link
+        href="/"
+        className="rounded-full bg-slate-50 px-3 py-1 text-xs font-medium text-slate-700 transition-colors hover:bg-slate-100"
+      >
+        返回首页
+      </Link>
+    </div>
 
       <p className="text-slate-700">
         当前“开心”日记数量：{" "}
