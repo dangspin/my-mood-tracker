@@ -1,65 +1,48 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import { useEffect, useState } from "react";
+import DiaryCard, { Diary } from "@/components/DiaryCard";
+
+export default function HomePage() {
+  const [diaries, setDiaries] = useState<Diary[]>([]); // useState：创建一个状态来保存从 API 获取到的日记列表
+
+  useEffect(() => {
+    // useEffect：在组件挂载后执行副作用逻辑，比如请求数据
+    const fetchDiaries = async () => {
+      try {
+        const res = await fetch("/api/diaries"); // fetch：向我们的 API 路由 /api/diaries 发送 GET 请求
+        if (!res.ok) {
+          throw new Error("获取日记失败");
+        }
+        const data: Diary[] = await res.json(); // 把响应体解析成 JavaScript 对象
+        setDiaries(data); // 使用 setDiaries 更新组件状态
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchDiaries(); // 调用上面定义的异步函数
+  }, []); // 依赖数组 []：表示这个 useEffect 只在组件首次渲染后执行一次
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+    <div>
+      <h2 className="mb-4 text-lg font-semibold text-slate-800">
+        今天的心情记录
+      </h2>
+
+      <div>
+        {diaries.map((diary) => (
+          // map：遍历 diaries 数组，把每一项渲染成一个 DiaryCard 组件
+          <DiaryCard key={diary.id} diary={diary} />
+        ))}
+      </div>
+
+      {diaries.length === 0 && (
+        <p className="mt-4 text-sm text-slate-500">
+          暂时没有日记数据，请确认 API 是否正常工作。
+        </p>
+      )}
     </div>
   );
 }
+
