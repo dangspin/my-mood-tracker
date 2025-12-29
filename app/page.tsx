@@ -29,23 +29,34 @@ export default function HomePage() {
     setNewMood("开心");
   };
 
-  useEffect(() => {
-    // useEffect：在组件挂载后执行副作用逻辑，比如请求数据
-    const fetchDiaries = async () => {
+    useEffect(() => {
+    const loadDiaries = async () => {
       try {
-        const res = await fetch("/api/diaries"); // fetch：向我们的 API 路由 /api/diaries 发送 GET 请求
+        const stored = window.localStorage.getItem("mood-diaries");
+        if (stored) {
+          const parsed: Diary[] = JSON.parse(stored);
+          setDiaries(parsed);
+          return;
+        }
+
+        const res = await fetch("/api/diaries");
         if (!res.ok) {
           throw new Error("获取日记失败");
         }
-        const data: Diary[] = await res.json(); // 把响应体解析成 JavaScript 对象
-        setDiaries(data); // 使用 setDiaries 更新组件状态
+        const data: Diary[] = await res.json();
+        setDiaries(data);
       } catch (error) {
         console.error(error);
       }
     };
 
-    fetchDiaries(); // 调用上面定义的异步函数
-  }, []); // 依赖数组 []：表示这个 useEffect 只在组件首次渲染后执行一次
+    loadDiaries();
+  }, []);
+
+  useEffect(() => {
+    if (diaries.length === 0) return;
+    window.localStorage.setItem("mood-diaries", JSON.stringify(diaries));
+  }, [diaries]);
 
   return (
     <div>
