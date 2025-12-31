@@ -12,21 +12,28 @@ export default function StatsPage() {
   const [selectedMood, setSelectedMood] = useState<MoodFilter>("开心");
 
   useEffect(() => {
-    const fetchDiaries = async () => {
-      try {
-        const res = await fetch("/api/diaries");
-        if (!res.ok) {
-          throw new Error("获取日记失败");
-        }
-        const data: Diary[] = await res.json();
-        setDiaries(data);
-      } catch (error) {
-        console.error(error);
+  const loadDiaries = async () => {
+    try {
+      const stored = window.localStorage.getItem("mood-diaries");
+      if (stored) {
+        const parsed: Diary[] = JSON.parse(stored);
+        setDiaries(parsed);
+        return;
       }
-    };
 
-    fetchDiaries();
-  }, []);
+      const res = await fetch("/api/diaries");
+      if (!res.ok) {
+        throw new Error("获取日记失败");
+      }
+      const data: Diary[] = await res.json();
+      setDiaries(data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  loadDiaries();
+}, []);
 
   const filteredDiaries =
   selectedMood === "全部"
