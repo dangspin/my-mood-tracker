@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Heart } from "lucide-react";
+import confetti from "canvas-confetti";
 
 export type Diary = {
   id: number;
@@ -19,6 +20,12 @@ export default function DiaryCard({ diary }: DiaryCardProps) {
 
   const handleLike = () => {
     setLikedCount((prev) => prev + 1); // 使用 setLikedCount 更新状态，让点赞数加 1
+
+    confetti({
+    particleCount: 60,
+    spread: 45,
+    origin: { x: 0.5, y: 0.6 },
+  });
   };
 
   return (
