@@ -16,4 +16,5 @@ model Diary {
   mood      String
   date      String
   createdAt DateTime @default(now())
+  userId    String?  // 新增：这条日记属于哪个用户
 }

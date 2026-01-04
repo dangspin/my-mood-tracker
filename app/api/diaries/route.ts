@@ -1,11 +1,20 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { auth } from "@clerk/nextjs/server";
 
 export async function GET() {
   try {
+    const { userId } = await auth();
+
+    if (!userId) {
+      return NextResponse.json({ message: "未登录" }, { status: 401 });
+    }
+
     const diaries = await prisma.diary.findMany({
+      where: { userId },
       orderBy: { id: "desc" },
     });
+
     return NextResponse.json(diaries);
   } catch (error) {
     console.error(error);
@@ -15,6 +24,12 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
+    const { userId } = await auth();
+
+    if (!userId) {
+      return NextResponse.json({ message: "未登录" }, { status: 401 });
+    }
+
     const body = await request.json();
     const { content, mood, date } = body as {
       content?: string;
@@ -34,6 +49,7 @@ export async function POST(request: Request) {
         content: content.trim(),
         mood,
         date: date ?? new Date().toISOString().slice(0, 10),
+        userId,
       },
     });
 
