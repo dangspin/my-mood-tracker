@@ -1,40 +1,46 @@
 import { NextResponse } from "next/server";
-
-type Diary = {
-  id: number;
-  content: string;
-  mood: "开心" | "平静" | "难过" | "兴奋";
-  date: string;
-};
-
-const diaries: Diary[] = [
-  {
-    id: 1,
-    content: "今天第一次用 Next.js 写 App Router，小有成就感！",
-    mood: "开心",
-    date: "2025-01-01",
-  },
-  {
-    id: 2,
-    content: "工作有点忙，不过慢慢来，保持节奏。",
-    mood: "平静",
-    date: "2025-01-02",
-  },
-  {
-    id: 3,
-    content: "遇到一个难 Bug，卡了很久，有点沮丧。",
-    mood: "难过",
-    date: "2025-01-03",
-  },
-  {
-    id: 4,
-    content: "终于把 Bug 解决了！准备学习更多 Next.js 知识。",
-    mood: "兴奋",
-    date: "2025-01-04",
-  },
-];
+import { prisma } from "@/lib/prisma";
 
 export async function GET() {
-  return NextResponse.json(diaries);
+  try {
+    const diaries = await prisma.diary.findMany({
+      orderBy: { id: "desc" },
+    });
+    return NextResponse.json(diaries);
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json({ message: "获取日记失败" }, { status: 500 });
+  }
+}
+
+export async function POST(request: Request) {
+  try {
+    const body = await request.json();
+    const { content, mood, date } = body as {
+      content?: string;
+      mood?: string;
+      date?: string;
+    };
+
+    if (!content || !mood) {
+      return NextResponse.json(
+        { message: "content 和 mood 必填" },
+        { status: 400 },
+      );
+    }
+
+    const diary = await prisma.diary.create({
+      data: {
+        content: content.trim(),
+        mood,
+        date: date ?? new Date().toISOString().slice(0, 10),
+      },
+    });
+
+    return NextResponse.json(diary, { status: 201 });
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json({ message: "新增日记失败" }, { status: 500 });
+  }
 }
 

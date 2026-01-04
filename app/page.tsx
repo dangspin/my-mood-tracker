@@ -9,25 +9,39 @@ export default function HomePage() {
   const [newContent, setNewContent] = useState("");
   const [newMood, setNewMood] = useState("开心");
 
-  const handleAddDiary = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    if (!newContent.trim()) return;
+  const handleAddDiary = async (event: FormEvent<HTMLFormElement>) => {
+  event.preventDefault();
+  if (!newContent.trim()) return;
 
-    const nextId =
-      diaries.length > 0 ? Math.max(...diaries.map((diary) => diary.id)) + 1 : 1;
-    const today = new Date().toISOString().slice(0, 10);
+  const today = new Date().toISOString().slice(0, 10);
 
-    const newDiary: Diary = {
-      id: nextId,
-      content: newContent.trim(),
-      mood: newMood,
-      date: today,
-    };
+  try {
+    const res = await fetch("/api/diaries", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        content: newContent.trim(),
+        mood: newMood,
+        date: today,
+      }),
+    });
 
-    setDiaries((prev) => [newDiary, ...prev]);
+    if (!res.ok) {
+      console.error("创建日记失败", await res.text());
+      return;
+    }
+
+    const created: Diary = await res.json();
+
+    setDiaries((prev) => [created, ...prev]);
     setNewContent("");
     setNewMood("开心");
-  };
+  } catch (error) {
+    console.error("请求 /api/diaries 失败", error);
+  }
+};
 
     useEffect(() => {
     const loadDiaries = async () => {

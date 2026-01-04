@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { ClerkProvider } from "@clerk/nextjs";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -12,19 +13,22 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="zh-CN">
-      <body className="bg-slate-100 min-h-screen">
-        <header className="bg-white shadow-sm">
-          <div className="mx-auto max-w-3xl px-4 py-4">
-            <h1 className="text-xl font-semibold text-slate-800">
-              心情日记板 Mood Tracker
-            </h1>
-          </div>
-        </header>
+    <ClerkProvider>
+      <html lang="zh-CN">
+        <body className="bg-slate-100 min-h-screen">
+          <header className="bg-white shadow-sm">
+            <div className="mx-auto max-w-3xl px-4 py-4 flex items-center justify-between">
+              <h1 className="text-xl font-semibold text-slate-800">
+                心情日记板 Mood Tracker
+              </h1>
+              {/* 这里以后可以放 UserButton / SignInButton */}
+            </div>
+          </header>
 
-        <main className="mx-auto max-w-3xl px-4 py-6">{children}</main>
-      </body>
-    </html>
+          <main className="mx-auto max-w-3xl px-4 py-6">{children}</main>
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }
 
